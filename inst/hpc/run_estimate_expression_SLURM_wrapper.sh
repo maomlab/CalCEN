@@ -3,7 +3,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --mem-per-cpu=1000m 
+#SBATCH --mem-per-cpu=1000m
 #SBATCH --time=100:00
 
 ### This is a SLURM submission script to estimate gene expression from RNA-seq run data from SRA

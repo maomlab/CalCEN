@@ -23,7 +23,7 @@
 #' @param fastq_dump_program path to fastq_dump
 #' @param rsem_calculate_expression_program path to rsem-calculate-expression
 #'
-#' 
+#'
 #' @export
 estimate_expression <- function(
     run_accession,
@@ -137,7 +137,7 @@ estimate_expression <- function(
 #' Submit estimate gene expression job to SLURM cluster
 #'
 #'   Reads gene expression estimate jobs from
-#' 
+#'
 #'      intermediate_data/todo_runs_<tag>.tsv
 #'          # tab separated table with column [run_accession]
 #'
@@ -154,14 +154,14 @@ estimate_expression <- function(
 #'         ~/opt/CalCEN/inst/run_estimate_expression_SLURM_wrapper.sh . <tag>
 #'
 #'   A demon of running from the shell
-#' 
+#'
 #'      export BASE_DIR=/home/maom/opt/CalCEN
 #'      export JOB_DIR=/scratch/maom_root/maom99/maom/CalCEN/estimate_expression_20201007
 #'      export SLURM_ARRAY_TASK_ID=1
 #'      ~/opt/CalCEN/inst/run_estimate_expression_SLURM_wrapper.sh
-#' 
+#'
 #'   this will set:
-#' 
+#'
 #'      TAG: 20201007
 #'      BASE_DIR: /home/maom/opt/CalCEN/vignettes/<network>
 #'      SLURM_ARRAY_TASK_ID: 1
@@ -171,23 +171,23 @@ estimate_expression <- function(
 #'      TASK_NAME: estimated_expression_1
 #'      JOB_DIR: /scratch/maom_root/maom99/maom/CalCEN/estimated_expression_20201007
 #'      TASK_DIR: /scratch/maom_root/maom99/maom/CalCEN/estimated_expression_20201007/estimated_expression_1
-#' 
+#'
 #'  and then call
-#' 
+#'
 #'      Rscript ~/opt/CalCEN/scripts/run_estimate_expression.R \
 #'          --runs_fname ${BASE_DIR}intermediate_data/todo_runs_20201007.tsv \
 #'          --run_id 1 \
 #'          --results_dir ${BASE_DIR}/intermediate_data/estimated_expression_20201007 \
 #'          --logs_dir ${BASE_DIR}/intermediate_data/estimated_expression_20201007/logs \
 #'          --work_dir ${TASK_DIR}/estimated_expression_1
-#' 
+#'
 #' @param tag label for scratch and result directories
 #' @param base_dir directory for project
 #' @param scratch_dir scratch directory for the project
 #' @param slurm_account slurm account
 #' @param slurm_mail_user email for slurm job updates at BEGIN,END
 #' @param slurm_partition partition on slurm cluster where to run the job
-#' 
+#'
 #' @export
 submit_estimate_expression_slurm <- function(
     tag,
@@ -222,4 +222,4 @@ submit_estimate_expression_slurm <- function(
     system(cmd_str)
     cat(info_message, "\n", sep = "")
     cat("Check results when done: intermediate_data/estimated_expression_", tag, "/logs\n", sep = "")
-}        
+}

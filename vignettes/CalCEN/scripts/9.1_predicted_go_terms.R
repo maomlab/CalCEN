@@ -34,7 +34,7 @@ CalCEN_go_pred <- CalCEN_full_go_pred[[2]] %>%
     dplyr::mutate(score = score / sum(score)) %>%
     dplyr::mutate(score = score * 100000) %>%
     dplyr::ungroup()
-    
+
 
 CalCEN_go_pred %>%
     readr::write_tsv("product/CalCEN_full_predicted_go_terms_20210121.tsv")

@@ -5,12 +5,14 @@
 #' to get the runs that have been completed
 #' 
 #' @param results_dir directory to look for completed estimated expression runs
-#' @param check_for_logs check for logs
+#' @param check_for_logs check for logs (default: TRUE)
+#' @param verbose (default: TRUE)
 #' @return data.frame with column [run_accession] of runs that have been completed
 #' @export
 validate_estimated_expression <- function(
     path,
-    check_for_logs = TRUE) {
+    check_for_logs = TRUE,
+    verbose = TRUE) {
     if (verbose) {
         cat("Getting estimated expression runs from '", path, "' ...\n", sep = "")
     }
