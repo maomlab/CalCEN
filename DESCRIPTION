@@ -7,8 +7,8 @@ Description: A Co-expression network is a gene-gene similarity
   expression profiles across a range of RNAseq studies
 Authors@R: person("Matthew", "O'Meara", email = "maom@umich.edu",
     role = c("aut", "cre"))
-URL: http://github.com/momeara/CalCEN
-BugReports: https://github.com/momeara/CalCEN/issues
+URL: http://github.com/maomlab/CalCEN
+BugReports: https://github.com/maomlab/CalCEN/issues
 Depends:
     R (>= 3.6.0)
 biocViews:
