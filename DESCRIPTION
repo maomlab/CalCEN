@@ -48,7 +48,9 @@ Imports:
 Remotes:
     momeara/Bethany,
     cole-trapnell-lab/leidenbase,
-    cole-trapnell-lab/monocle3
+    cole-trapnell-lab/monocle3,
+    cvarrichio/Matrix.utils,
+    biocodellc/geomedb
 Collage:
     "load_parameters.R",
     "define_runs.R",
@@ -63,5 +65,5 @@ Collage:
     "plot_network_heatmap.R",
     "deep_fri.R",
     "util.R"
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Encoding: UTF-8
