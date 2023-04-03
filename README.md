@@ -9,6 +9,6 @@ https://doi.org/10.1128/mSphere.01245-20
 
 # Install
 
-    git clone git@github.com:momeara/CalCEN
+    git clone git@github.com:maomlab/CalCEN
     cd CalCEN
     Rscript -e "devtools::install_local('.')"
