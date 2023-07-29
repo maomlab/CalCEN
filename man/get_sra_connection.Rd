@@ -6,9 +6,16 @@
 \usage{
 get_sra_connection(parameters, verbose = TRUE)
 }
+\arguments{
+\item{parameters}{list having element data_paths$scratch_dir}
+
+\item{verbose}{print verbose output}
+}
+\value{
+dtabase connection to the sra metadata database
+}
 \description{
 if it doesn't exist download it to
-}
-\details{
-<parameters$data_path$scratch_dir>/sra_meta/SRAmetadb.sqlite
+
+  <parameters$data_path$scratch_dir>/sra_meta/SRAmetadb.sqlite
 }

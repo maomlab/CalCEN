@@ -13,9 +13,8 @@ download_expression_data(runs, sra_dir, verbose = TRUE)
 }
 \description{
 Use prefetch to download data from the SRA to
-}
-\details{
-<sra_dir>/<run_accesion>/<run_accession>.sra
+
+    <sra_dir>/<run_accesion>/<run_accession>.sra
 
   Each expression run is ~8 Gb, so roughly 1000 runs will require
   approximately 8 terabytes of space

@@ -42,7 +42,7 @@ Imports:
     SingleCellExperiment (>= 1.12.0),
     SummarizedExperiment (>= 1.20.0),
     batchelor (>= 1.6.1),
-    Matrix.utils (>= 0.9.8),
+    Matrix.utils,
     monocle3 (>= 0.2.3.0),
     Bethany (>= 0.0.0.9000)
 Remotes:
@@ -51,19 +51,6 @@ Remotes:
     cole-trapnell-lab/monocle3,
     cvarrichio/Matrix.utils,
     biocodellc/geomedb
-Collage:
-    "load_parameters.R",
-    "define_runs.R",
-    "download_expression_data.R",
-    "prepare_reference_genome.R",
-    "estimate_expression_data.R",
-    "validate_estimated_expression.R",
-    "gather_estimated_expression.R",
-    "build_coexp_network.R",
-    "go_annotations.R",
-    "network_gba.R",
-    "plot_network_heatmap.R",
-    "deep_fri.R",
-    "util.R"
 RoxygenNote: 7.2.3
 Encoding: UTF-8
+License: MIT + file LICENSE

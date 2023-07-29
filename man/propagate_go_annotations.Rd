@@ -7,7 +7,10 @@
 propagate_go_annotations(go_annotations, verbose = TRUE)
 }
 \arguments{
-\item{go_annotations}{data.frame with column go_id and object identifiers}
+\item{go_annotations}{data.frame with column go_id and object
+identifiers. A warning will be issued if it ia columns term,
+ontology, or definition as these are added from the
+\pkg{GO.db}.}
 
 \item{verbose}{(Default: TRUE)}
 }
@@ -19,7 +22,4 @@ data.frame with columns of input <go_annotations>
 GO terms are organized into a directed acyclic graph where an
 annotation fo a more specific term implies the annotation of the
 more general.
-}
-\details{
-GO terms are not
 }

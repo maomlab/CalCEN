@@ -4,7 +4,24 @@
 \alias{read_biogrid_tab2}
 \title{parse BioGRID tab2 format}
 \usage{
-read_biogrid_tab2(fname, taxon)
+From the command line, download the by-organism biogrid dataset for the desired release and filter for the desired organism
+
+    BIOGRID_RELEASE=3.4.161
+    ORGANISM_NAME=Candida_albicans_SC5314
+    pushd raw_data
+    wget https://downloads.thebiogrid.org/Download/BioGRID/Release-Archive/BIOGRID-${BIOGRID_RELEASE}/BIOGRID-ORGANISM-${BIOGRID_RELEASE}.tab2.zip
+    unzip BIOGRID-${BIOGRID_RELEASE}/BIOGRID-ORGANISM-${BIOGRID_RELEASE}.tab2.zip
+    ls | grep -v -e "${ORANISM_NAME}" | xargs rm
+    popd
+
+from R, parse biogrid data
+
+    biogrid_release <- "3.4.161"
+    organism_name <- "Candida_albicans_SC5314"
+    taxon <- "237561"
+    biogrid_data <- CalCEN::read_biogrid_tab2(
+       fname = paste0("raw_data/biogrid/BIOGRID-ORGANISM-", organism_name, "-", biogrid_release, ".tab2.txt"),
+       taxon = taxon)
 }
 \arguments{
 \item{fname}{path to .tab2 file}
@@ -16,7 +33,7 @@ tibble::tibble with columns
    biogrid_interaction_id
    gene_id_1
    gene_id_2
-   biogrid_id_1
+   biogrid_id_1o
    biogrid_id_2
    feature_name_1
    feature_name_2
@@ -37,26 +54,6 @@ tibble::tibble with columns
    qualifications
    tags
    source_database
-
-usage:
-From the command line, download the by-organism biogrid dataset for the desired release and filter for the desired organism
-
-    BIOGRID_RELEASE=3.4.161
-    ORGANISM_NAME=Candida_albicans_SC5314
-    pushd raw_data
-    wget https://downloads.thebiogrid.org/Download/BioGRID/Release-Archive/BIOGRID-${BIOGRID_RELEASE}/BIOGRID-ORGANISM-${BIOGRID_RELEASE}.tab2.zip
-    unzip BIOGRID-${BIOGRID_RELEASE}/BIOGRID-ORGANISM-${BIOGRID_RELEASE}.tab2.zip
-    ls | grep -v -e "${ORANISM_NAME} | xargs rm
-    popd
-
-from R, parse biogrid data
-
-    biogrid_release <- "3.4.161"
-    organism_name <- "Candida_albicans_SC5314"
-    taxon <- "237561"
-    biogrid_data <- CalCEN::read_biogrid_tab2(
-       fname = paste0("raw_data/biogrid/BIOGRID-ORGANISM-", organism_name, "-", biogrid_release, ".tab2.txt"),
-       taxon = taxon)
 }
 \description{
 Biogrid is a database curating protein-protein interactions

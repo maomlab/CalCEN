@@ -2,7 +2,7 @@
 % Please edit documentation in R/deep_fri.R
 \name{get_deepfri_predictions}
 \alias{get_deepfri_predictions}
-\title{Use the DeepFRI webserver to get sequence and structure based gene function prediction}
+\title{Use the DeepFRI webserver for gene function prediction}
 \usage{
 get_deepfri_predictions(
   pdb_fname,
@@ -33,17 +33,7 @@ data.frame with columns
     go_term: e.g. GO:0044237
     go_term_name: e.g. "cellular metabolic process"
     go_termscore: prediction score
-}
-\description{
-Using the https://beta.deepfri.flatironinstitute.org/ webserver
- Use Structure-based gene function predictions using graph convolutional networks
- (Gligorijevic, et al., 2019)
-}
-\details{
-If you use for more than few predictions please coordinate with the Bonneau lab
- to not abuse their resources
-
- usage example:
+ @usage
    On disk: <tag>.pdb
    In R:
 
@@ -53,9 +43,20 @@ If you use for more than few predictions please coordinate with the Bonneau lab
 
 If you use please cite:
 
-	Gligorijevic, Vladimir and Renfrew, P. Douglas and Kosciolek, Tomasz and Leman,
-     Julia Koehler and Cho, Kyunghyun and Vatanen, Tommi and Berenberg, Daniel
-	and Taylor, Bryn and Fisk, Ian M. and Xavier, Ramnik J. and Knight, Rob and Bonneau, Richard
-	Structure-Based Function Prediction using Graph Convolutional Networks
-	2019, https://www.biorxiv.org/content/early/2019/10/04/786236
+     Gligorijevic, Vladimir and Renfrew, P. Douglas and Kosciolek,
+     Tomasz and Leman, Julia Koehler and Cho, Kyunghyun and
+     Vatanen, Tommi and Berenberg, Daniel and Taylor, Bryn and
+     Fisk, Ian M. and Xavier, Ramnik J. and Knight, Rob and
+     Bonneau, Richard Structure-Based Function Prediction using
+     Graph Convolutional Networks 2019,
+     https://www.biorxiv.org/content/early/2019/10/04/786236
+}
+\description{
+@description Using the https://beta.deepfri.flatironinstitute.org/
+    webserver Use Structure-based gene function predictions using
+    graph convolutional networks (Gligorijevic, et al., 2019)
+}
+\details{
+If you use for more than few predictions please coordinate with
+ the Bonneau lab to not abuse their resources
 }

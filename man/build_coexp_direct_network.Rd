@@ -12,8 +12,7 @@ build_coexp_direct_network(
 )
 }
 \arguments{
-\item{estimated_expression}{data.frame with columns
-gene_id
+\item{estimated_expression}{data.frame with columns gene_id
 run_accession}
 
 \item{genes}{vector of gene labels}
@@ -21,9 +20,10 @@ run_accession}
 \item{verbose}{verbose output (default: FALSE)}
 }
 \value{
-result of huge::huge.select
-    In particular .$merge[<nlambda>] is a n_gene by n_gene co-expression matrix
+result of huge::huge.select In particular
+    .$merge[<nlambda>] is a n_gene by n_gene co-expression matrix
 }
 \description{
-Use the graphical lasso to estimate a sparse co-expression matrix huge package
+Use the graphical lasso to estimate a sparse
+co-expression matrix huge package
 }

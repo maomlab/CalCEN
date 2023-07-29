@@ -4,7 +4,8 @@
 #' from hight- and low-throughput physical and genetic interactions
 #'
 #' @param fname path to .tab2 file
-#' @param taxon filter for interactions where both partners are from ncbi <taxon>
+#' @param taxon filter for interactions where both partners are from ncbi
+#'   <taxon>
 #' @return tibble::tibble with columns
 #'    biogrid_interaction_id
 #'    gene_id_1
@@ -32,14 +33,15 @@
 #'    source_database
 #'
 #' @usage
-#' From the command line, download the by-organism biogrid dataset for the desired release and filter for the desired organism
+#' From the command line, download the by-organism biogrid dataset for the
+#' desired release and filter for the desired organism
 #'
 #'     BIOGRID_RELEASE=3.4.161
 #'     ORGANISM_NAME=Candida_albicans_SC5314
 #'     pushd raw_data
 #'     wget https://downloads.thebiogrid.org/Download/BioGRID/Release-Archive/BIOGRID-${BIOGRID_RELEASE}/BIOGRID-ORGANISM-${BIOGRID_RELEASE}.tab2.zip
 #'     unzip BIOGRID-${BIOGRID_RELEASE}/BIOGRID-ORGANISM-${BIOGRID_RELEASE}.tab2.zip
-#'     ls | grep -v -e "${ORANISM_NAME} | xargs rm
+#'     ls | grep -v -e "${ORANISM_NAME}" | xargs rm
 #'     popd
 #'
 #' from R, parse biogrid data

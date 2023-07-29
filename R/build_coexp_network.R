@@ -17,9 +17,9 @@ build_coexp_intra_study_spearman_network <- function(
      verbose = FALSE) {
 
     if (
-        !("study_accesion" %in% names(estimated_expression)) |
-        !("run_accession" %in% names(estimated_expression)) |
-        !("gene_id" %in% names(estimated_expression)) |
+        !("study_accesion" %in% names(estimated_expression)) ||
+        !("run_accession" %in% names(estimated_expression)) ||
+        !("gene_id" %in% names(estimated_expression)) ||
         !("FPKM" %in% names(estimated_expression))) {
 
         stop(

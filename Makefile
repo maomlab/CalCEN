@@ -1,3 +1,4 @@
+.ONESHELL:
 
 PREFIX=~/opt
 
@@ -44,8 +45,31 @@ install_prerequisites:
 	make install DESTDIR=${PREFIX} prefix=${PREFIX}
 	popd
 
-make CalCEN:
-	cp scripts/parameters_template.R parameters.R
+
+install:
+	Rscript -e "devtools::install_local('.', force = TRUE)"
+
+test:
+	Rscript -e "devtools::check()"
+	Rscript -e "covr::package_coverage()"
+	Rscript -e "lintr::lint_package()"
+	Rscript -e "urlchecker::url_check()"
+	Rscript -e "docreview::package_review()"
+	Rscript -e "spelling::spell_check_package()"
+
+test_alt_builds:
+	# this will email the package developer
+	Rscript -e "devtools::check_win_devel(quiet = TRUE)"
+	Rscript -e "devtools::check_win_release(quiet = TRUE)"
+	Rscript -e "devtools::check_win_release(quiet = TRUE)"
+	Rscript -e "devtools::check_mac_release(quiet = TRUE)"
+
+	# call rhub::validate_email_first(email = <email>) first
+	Rscript -e "devtools::check_rhub()"
+	Rscript -e "revdepcheck::revdep_check(num_workers = 4)"
+
+CalCEN:
+	cp vignettes/CalCEN/parameters_template.R parameters.R
 	Rscript scripts/1_define_runs.R
 	Rscript scripts/2_download_runs.R
 	Rscript scripts/3_reference_genome.R
@@ -54,3 +78,7 @@ make CalCEN:
 	Rscript scripts/6.1.1_collect_estimated_expression_meta.R
 	Rscript scripts/6.1.2_build_coexp_network.R
 	Rscript scripts/6.1.3_rna_seq_quality_control.R
+
+
+
+.PHONY: install_prerequisites install test test_alt_builds CalCEN
