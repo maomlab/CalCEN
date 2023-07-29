@@ -1,7 +1,6 @@
-
 #' parse BioGRID tab2 format
 #'
-#' Biogrid is a database curating protein-protein interactions
+#' @description Biogrid is a database curating protein-protein interactions
 #' from hight- and low-throughput physical and genetic interactions
 #'
 #' @param fname path to .tab2 file
@@ -32,9 +31,9 @@
 #'    tags
 #'    source_database
 #'
-#' usage:
+#' @usage
 #' From the command line, download the by-organism biogrid dataset for the desired release and filter for the desired organism
-#' 
+#'
 #'     BIOGRID_RELEASE=3.4.161
 #'     ORGANISM_NAME=Candida_albicans_SC5314
 #'     pushd raw_data
@@ -51,7 +50,7 @@
 #'     biogrid_data <- CalCEN::read_biogrid_tab2(
 #'        fname = paste0("raw_data/biogrid/BIOGRID-ORGANISM-", organism_name, "-", biogrid_release, ".tab2.txt"),
 #'        taxon = taxon)
-#' 
+#'
 #' @export
 read_biogrid_tab2 <- function(fname, taxon) {
   readr::read_tsv(
@@ -82,7 +81,7 @@ read_biogrid_tab2 <- function(fname, taxon) {
       "qualifications",
       "tags",
       "source_database"),
-    col_types=readr::cols(
+    col_types = readr::cols(
       biogrid_interaction_id = readr::col_double(),
       gene_id_1 = readr::col_double(),
       gene_id_2 = readr::col_double(),
@@ -106,8 +105,8 @@ read_biogrid_tab2 <- function(fname, taxon) {
       phenotypes = readr::col_character(),
       qualifications = readr::col_character(),
       tags = readr::col_character(),
-      source_database = readr::col_character())) %>%
-    dplyr::filter(taxon_1 == taxon, taxon_2 == taxon) %>%
+      source_database = readr::col_character())) |>
+    dplyr::filter(taxon_1 == taxon, taxon_2 == taxon) |>
     dplyr::mutate(
       experimental_system_abbreviation = dplyr::case_when(
         experimental_system == "Dosage Lethality" ~ "DL",
@@ -140,5 +139,5 @@ read_biogrid_tab2 <- function(fname, taxon) {
         experimental_system == "Affinity Capture-MS" ~ "AP-MS",
         TRUE ~ experimental_system),
       throughput_abbreviation = ifelse(
-          throughput == "High Throughput", "ht", "lt"))
+        throughput == "High Throughput", "ht", "lt"))
 }
