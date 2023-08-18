@@ -1,18 +1,19 @@
 #' Estimate expression data from SRA run and reference genome
 #'
 #'
-#' Example
-#'
+#' 
+#' @usage
 #' tag <- "20201209"
+#' scratch_dir <- "/scratch/maom_root/maom99/maom/CryptoCEN"
 #' estimate_expression(
 #'    run_accession = "SRR513613",
-#'    sra_fname = "/scratch/maom_root/maom99/maom/CryptoCEN/sra/SRR513613/SRR513613.sra",
+#'    sra_fname = paste0(scratch_dir, "/sra/SRR513613/SRR513613.sra"),
 #'    is_paired = TRUE,
 #'    results_dir = "intermediate_data/estimated_expression_20201209",
 #'    results_dir = "intermediate_data/estimated_expression_20201209/logs",
-#'    work_dir = "/scratch/maom_root/maom99/maom/CryptoCEN/estimated_expression_20201209",
-#'    reference_genome_path = "/scratch/maom_root/maom99/maom/CryptoCEN/reference_geneome",
-#'    fastq_dump_program = "
+#'    work_dir = paste0(scratch_dir, "/estimated_expression_20201209"),
+#'    reference_genome_path = paste0(scratch_dir"/reference_geneome"))
+#'    
 #' @param run_accession identifier for exprsesion run
 #' @param sra_fname path to .sra file for the run
 #' @param is_paired is it paired end read expression data?
@@ -33,9 +34,9 @@ estimate_expression <- function(
     logs_dir,
     work_dir,
     reference_genome_path,
-    fastq_dump_program,
-    rsem_calculate_expression_program,
-    bowtie2_path,
+    fastq_dump_program = "fastq-dump",
+    rsem_calculate_expression_program "rsem-calculate-expression",
+    bowtie2_path = "~/opt/bowtie2-2.3.4.1-linux-x86_64",
     n_threads = 1) {
     log_fname <-  paste0(work_dir, "/", run_accession, ".log")
     cat("Writing logs to ", log_fname, "\n", sep = "")
@@ -52,12 +53,12 @@ estimate_expression <- function(
         "# n_threads: ", n_threads, "\n\n",
         sep = "", file = log_fname, append = TRUE)
 
-    run_cmd <- function(info, cmd_str, log_fname=NULL) {
+    run_cmd <- function(info, cmd_str, log_fname = NULL) {
         cmd_str <- paste0("cd ", work_dir, " && ", cmd_str)
         if (!is.null(log_fname)) {
                 cat("\n", sep = "", file = log_fname, append = TRUE)
-                cat("# ", info, "\n", sep = "", file = log_fname, append=TRUE)
-                cat(cmd_str, "\n", sep = "", file = log_fname, append=TRUE)
+                cat("# ", info, "\n", sep = "", file = log_fname, append = TRUE)
+                cat(cmd_str, "\n", sep = "", file = log_fname, append = TRUE)
                 system(paste0(cmd_str, " >> ", log_fname, " 2>&1"))
                 cat("\n\n", file = log_fname, append = TRUE)
         } else {
@@ -76,16 +77,19 @@ estimate_expression <- function(
         if (!is_paired) {
             run_cmd(
                 info = "Convert .sra to .fastq assuming single-end reads",
-                cmd_str = paste0(fastq_dump_program, " --gzip --skip-technical  --readids --read-filter pass --dumpbase --clip ", run_accession, ".sra"),
+                cmd_str = paste0(
+                    fastq_dump_program, " --gzip --skip-technical  --readids ",
+                    "--read-filter pass --dumpbase --clip ", run_accession, ".sra"),
                 log_fname = log_fname)
         } else {
-                # there is a typo in the fastq-dump command line arguments for version 2.10.8
-                # https://github.com/ncbi/sra-tools/issues/381
-                good_sra_version <- system(
-                        command = paste0(fastq_dump_program, " --version"),
-                        intern = TRUE)[2] %>%
-                        stringr::str_extract("[0-9.]+$") %>%
-                        compareVersion("2.10.8")
+            # there is a typo in the fastq-dump command line arguments for
+            # version 2.10.8
+            # https://github.com/ncbi/sra-tools/issues/381
+            good_sra_version <- system(
+                command = paste0(fastq_dump_program, " --version"),
+                intern = TRUE)[2] |>
+                stringr::str_extract("[0-9.]+$") |>
+                compareVersion("2.10.8")
             if (good_sra_version) {
                 split_flag <- "--split-3"
             } else {
@@ -93,7 +97,10 @@ estimate_expression <- function(
             }
             run_cmd(
                 info = "Convert .sra to .fastq assuming paired-end reads",
-                cmd_str = paste0(fastq_dump_program, " --gzip --skip-technical  --readids --read-filter pass --dumpbase ", split_flag, " --clip ", run_accession, ".sra"),
+                cmd_str = paste0(
+                    fastq_dump_program, " --gzip --skip-technical ",
+                    "--readids --read-filter pass --dumpbase ", split_flag, " ",
+                    "--clip ", run_accession, ".sra"),
                 log_fname = log_fname)
         }
 
@@ -101,12 +108,24 @@ estimate_expression <- function(
         if (!is_paired) {
             run_cmd(
                 info = "Estimate expression levels assuming single-end reads",
-                cmd_str = paste0(rsem_calculate_expression_program, " -p ", n_threads, " --no-bam-output --estimate-rspd --bowtie2 --bowtie2-path ", bowtie2_path, " --append-names ", run_accession, "_pass.fastq.gz ", reference_genome_path, " ", run_accession),
+                cmd_str = paste0(
+                    rsem_calculate_expression_program, " ",
+                    "-p ", n_threads, " ",
+                    "--no-bam-output --estimate-rspd --bowtie2 ",
+                    "--bowtie2-path ", bowtie2_path, " ",
+                    "--append-names ", run_accession, "_pass.fastq.gz ",
+                    reference_genome_path, " ", run_accession),
                 log_fname = log_fname)
         } else {
             run_cmd(
                 info = "Estimate expression levels assuming paired-end reads",
-                cmd_str = paste0(rsem_calculate_expression_program, " -p ", n_threads, " --paired-end --no-bam-output --estimate-rspd --bowtie2 --bowtie2-path ", bowtie2_path, " --append-names ", run_accession, "_pass_1.fastq.gz ", run_accession, "_pass_2.fastq.gz ", reference_genome_path, " ", run_accession),
+                cmd_str = paste0(
+                    rsem_calculate_expression_program, " -p ", n_threads, " ",
+                    "--paired-end --no-bam-output --estimate-rspd --bowtie2 ",
+                    "--bowtie2-path ", bowtie2_path, " ",
+                    "--append-names ", run_accession, "_pass_1.fastq.gz ",
+                    run_accession, "_pass_2.fastq.gz ",
+                    reference_genome_path, " ", run_accession),
                 log_fname = log_fname)
         }
 
@@ -122,10 +141,9 @@ estimate_expression <- function(
 
     cat("# Runtime: ", timing[3], "\n", sep = "", file = log_fname, append = TRUE)
 
-
     run_cmd(
         info = "Copy log file",
-        cmd_str=paste0("cp ", log_fname, " ", logs_dir),
+        cmd_str = paste0("cp ", log_fname, " ", logs_dir),
         log_fname = NULL)
 
     run_cmd(
@@ -136,7 +154,7 @@ estimate_expression <- function(
 
 #' Submit estimate gene expression job to SLURM cluster
 #'
-#'   Reads gene expression estimate jobs from
+#' @description  Reads gene expression estimate jobs from
 #'
 #'      intermediate_data/todo_runs_<tag>.tsv
 #'          # tab separated table with column [run_accession]
@@ -198,28 +216,30 @@ submit_estimate_expression_slurm <- function(
     slurm_partition) {
 
     if (!dir.exists(job_dir)) {
-            cat("Creating job directory: ", job_dir, "\n", sep = "")
-            dir.create(job_dir, recursive = TRUE)
+        cat("Creating job directory: ", job_dir, "\n", sep = "")
+        dir.create(job_dir, recursive = TRUE)
     }
 
     todo_runs
     cmd_str <- paste0(
-            "sbatch ",
-            "--account=", slurm_account, " ",
-            "--mail-user=", slurm_mail_user, " ",
-            "--mail-type=BEGIN,END,FAIL ",
-            "--array=1-", n_jobs, " ",
-            "--output='", job_dir, "/%j.log' ",
-            "--time=03:00:00 ",
-            "--export=",
-              "TAG='", tag, "',",
-              "BASE_DIR='", base_dir, "',",
-              "JOB_DIR='", job_dir, "' ",
-            "scripts/run_estimate_expression_SLURM_wrapper.sh")
+        "sbatch ",
+        "--account=", slurm_account, " ",
+        "--mail-user=", slurm_mail_user, " ",
+        "--mail-type=BEGIN,END,FAIL ",
+        "--array=1-", n_jobs, " ",
+        "--output='", job_dir, "/%j.log' ",
+        "--time=03:00:00 ",
+        "--export=",
+        "TAG='", tag, "',",
+        "BASE_DIR='", base_dir, "',",
+        "JOB_DIR='", job_dir, "' ",
+        "scripts/run_estimate_expression_SLURM_wrapper.sh")
     info_message <- "Monitor progress with 'squeue'"
 
     cat(cmd_str, "\n")
     system(cmd_str)
     cat(info_message, "\n", sep = "")
-    cat("Check results when done: intermediate_data/estimated_expression_", tag, "/logs\n", sep = "")
+    cat(
+        "Check results when done: ",
+        "intermediate_data/estimated_expression_", tag, "/logs\n", sep = "")
 }

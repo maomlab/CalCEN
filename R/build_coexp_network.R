@@ -87,7 +87,9 @@ build_coexp_direct_network <- function(
     # more numerically stable version of Hotelling::clr
     # https://stackoverflow.com/q/2602583/198401
     clr <- function(data) {
-        log_gms <- apply(data, 1, function(x){mean(log(x))})
+        log_gms <- apply(data, 1, function(x) {
+            mean(log(x))
+        })
         log(data) - log_gms
     }
 
@@ -97,7 +99,7 @@ build_coexp_direct_network <- function(
         huge::huge.npn() |>
         huge::huge(method = "mb", nlambda = nlambda)
 
-    coexp_direct <- full_direct |>
+    coexp_direct <- coexp_direct |>
         huge::huge.select(criterion = "stars", stars.thresh = 0.05)
 
     for (i in c(1:nlambda)) {

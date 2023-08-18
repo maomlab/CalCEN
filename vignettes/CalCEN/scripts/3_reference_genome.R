@@ -1,6 +1,3 @@
-# -*- tab-width:2;indent-tabs-mode:t;show-trailing-whitespace:t;rm-trailing-spaces:t -*-
-# vi: set ts=2 noet:
-
 source("parameters.R")
 
 base_dir <- paste0(scratch_dir, "/reference_genome")

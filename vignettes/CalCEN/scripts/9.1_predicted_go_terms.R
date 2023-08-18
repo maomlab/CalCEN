@@ -1,6 +1,3 @@
-# -*- tab-width:2;indent-tabs-mode:t;show-trailing-whitespace:t;rm-trailing-spaces:t -*-
-# vi: set ts=2 noet:
-
 library(plyr)
 library(dplyr)
 library(tidyr)
@@ -47,4 +44,3 @@ CalCEN_go_pred_gene_top5 <- CalCEN_go_pred %>%
 
 CalCEN_go_pred_gene_top5 %>%
     readr::write_tsv("product/CalCEN_full_predicted_go_terms_gene_top5_20210121.tsv")
-

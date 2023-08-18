@@ -28,18 +28,18 @@ exprs <- reshape2::acast(
 #############################
 
 CalCEN_network_full_spearman <- EGAD::build_coexp_network(
-	exprs=exprs,
-	gene.list=ca_genes)
+		exprs=exprs,
+		gene.list=ca_genes)
 
 save(CalCEN_network_full, file="product/CalCEN_network_full_spearman_20201024.Rdata")
 CalCEN_network_full_spearman %>%
-	as.data.frame() %>%
-	readr::write_tsv("product/CalCEN_network_full_spearman_20201024.tsv")
+		as.data.frame() %>%
+		readr::write_tsv("product/CalCEN_network_full_spearman_20201024.tsv")
 
 CalCEN_full_spearman <- CalCEN_network_full_spearman %>%
-	data.frame() %>%
-	tibble::rownames_to_column("feature_name_1") %>%
-	tidyr::gather(key="feature_name_2", value="score", -feature_name_1)
+		data.frame() %>%
+		tibble::rownames_to_column("feature_name_1") %>%
+		tidyr::gather(key="feature_name_2", value="score", -feature_name_1)
 save(CalCEN_full, file="intermediate_data/CalCEN_full_spearman.Rdata")
 
 #####################
@@ -69,14 +69,14 @@ CalCEN_intra_study_coexp_network_spearman <- CalCEN_intra_study_coexp_network_sp
 
 save(CalCEN_intra_study_coexp_network_spearman, file="product/CalCEN_intra_study_coexp_network_spearman_20201216.Rdata")
 CalCEN_intra_study_coexp_network_spearman %>%
-	as.data.frame() %>%
-	readr::write_tsv("product/CalCEN_intra_study_coexp_network_spearman_20201216.tsv")
+		as.data.frame() %>%
+		readr::write_tsv("product/CalCEN_intra_study_coexp_network_spearman_20201216.tsv")
 
 
 CalCEN_intra_study_coexp_spearman <- CalCEN_intra_study_coexp_network_spearman %>%
-	data.frame() %>%
-	tibble::rownames_to_column("feature_name_1") %>%
-	tidyr::gather(key="feature_name_2", value="score", -feature_name_1)
+		data.frame() %>%
+		tibble::rownames_to_column("feature_name_1") %>%
+		tidyr::gather(key="feature_name_2", value="score", -feature_name_1)
 
 save(CalCEN_intra_study_coexp_spearman, file="intermediate_data/CalCEN_intra_study_coexp_spearman.Rdata")
 
@@ -93,8 +93,8 @@ CalCEN_network_full_pearson <- EGAD::build_coexp_network(
 
 save(CalCEN_network_full_pearson, file="product/CalCEN_network_full_pearson_20201024.Rdata")
 CalCEN_network_full_pearson %>%
-	as.data.frame() %>%
-	readr::write_tsv("product/CalCEN_network_full_pearson_20201024.tsv")
+		as.data.frame() %>%
+		readr::write_tsv("product/CalCEN_network_full_pearson_20201024.tsv")
 
 CalCEN_full_pearson <- CalCEN_network_full_pearson %>%
     data.frame() %>%

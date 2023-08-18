@@ -22,7 +22,11 @@ propagate_go_annotations <- function(
         "term" %in% names(go_annotations) ||
         "ontology" %in% names(go_annotations) ||
         "definition" %in% names(go_annotations)) {
-        warning("the input go_annotations data.frame shouldn't have columns 'term', 'ontology' or 'definition', as these are retrieved from the GO terms themselves")
+        warning(
+            paste0(
+                "the input go_annotations data.frame shouldn't have ",
+                "columns 'term', 'ontology' or 'definition', as these ",
+                "are retrieved from the GO terms themselves"))
     }
 
     if (verbose) {
@@ -90,7 +94,9 @@ propagate_go_annotations <- function(
     }
 
     if (verbose) {
-        cat("Propagating provided ", nrow(go_annotations), " annotations to each ancestor.\n", sep = "")
+        cat(
+            "Propagating provided ", nrow(go_annotations),
+            " annotations to each ancestor.\n", sep = "")
     }
 
     go_annotations_propagated <- dplyr::bind_rows(

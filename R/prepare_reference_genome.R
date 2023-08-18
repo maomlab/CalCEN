@@ -3,7 +3,7 @@
 #'
 #' use rsem-prepare-reference to generate reference genome
 #' for mapping RNAseq transcripts
-#' 
+#'
 #' # Usage example:
 #' in parameters.yaml
 #'
@@ -22,7 +22,7 @@
 #'   library(CalCEN)
 #'   parameters <- CalCEN::load_parameters()
 #'   CalCEN::prepare_reference_genome()
-#' 
+#'
 #' @param parameters as read in by load_parameters()
 #' @param verbose (default: TRUE)
 #' @export
@@ -55,7 +55,7 @@ prepare_reference_genome <- function(
           "'", parameters$source_data$genome$transcript_fasta_path, "'",
           " does not exist."))
 
-    base_dir <- parameters$data_paths$reference_genome_path %>%
+    base_dir <- parameters$data_paths$reference_genome_path |>
         dirname()
     if (!dir.exists(paths = base_dir)) {
         cat("Creating output path '", base_dir, "'\n", sep = "")

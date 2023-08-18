@@ -1,6 +1,3 @@
-# -*- tab-width:2;indent-tabs-mode:t;show-trailing-whitespace:t;rm-trailing-spaces:t -*-
-# vi: set ts=2 noet:
-
 library(plyr)
 library(dplyr)
 library(tidyr)
@@ -12,8 +9,8 @@ library(gplots)
 load("intermediate_data/ca_silac_hsp90_intensities.Rdata")
 
 silac_genes <- ca_silac_hsp90_intensities %>%
-	dplyr::distinct(gene_label) %>%
-	magrittr::extract2("gene_label")
+    dplyr::distinct(gene_label) %>%
+    magrittr::extract2("gene_label")
 
 
 input_condition <- "wildtype"
@@ -21,12 +18,12 @@ fname <- "product/figures/silac_hsp90_correlation_heatmap_190121.pdf"
 height=30
 width=30
 silac_network <- ca_silac_hsp90_intensities %>%
-	dplyr::filter(condition==input_condition) %>%
-	dplyr::select(gene_label, fraction_index, intensity) %>%
-	tidyr::spread(fraction_index, intensity) %>%
-	tibble::column_to_rownames("gene_label") %>%
-	as.matrix() %>%
-	EGAD::build_coexp_network(silac_genes)
+    dplyr::filter(condition==input_condition) %>%
+    dplyr::select(gene_label, fraction_index, intensity) %>%
+    tidyr::spread(fraction_index, intensity) %>%
+    tibble::column_to_rownames("gene_label") %>%
+    as.matrix() %>%
+    EGAD::build_coexp_network(silac_genes)
 
 silac_network[is.na(silac_network)] <- 0
 
@@ -50,5 +47,5 @@ args <- c(list(x = silac_network, Colv = FALSE, Rowv = as.dendrogram(o_network))
 
 cat("plotting '", fname, "'...\n", sep="")
 pdf(fname, height=height, width=width)
-	suppressWarnings(ret <- do.call(gplots::heatmap.2, args))
+suppressWarnings(ret <- do.call(gplots::heatmap.2, args))
 dev.off()

@@ -62,7 +62,8 @@ assertthat::assert_that(
     msg = paste0(
         "reference genome path ",
         "'", paste0(
-            parameters$data_paths$reference_genome_path, ".transcripts.fa"), "'",
+            parameters$data_paths$reference_genome_path,
+            ".transcripts.fa"), "'",
         " does not exist. Make sure to run "))
 
 assertthat::assert_that(

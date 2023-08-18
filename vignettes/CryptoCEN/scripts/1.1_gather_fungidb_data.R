@@ -1,4 +1,3 @@
-
 library(tidyverse)
 library(seqinr)
 library(CalCEN)
@@ -27,16 +26,16 @@ gff_annotations <- readr::read_tsv(
         "strand",
         "frame",
         "attribute"),
-    skip = 17) %>%
-    dplyr::filter(feature == "gene") %>%
+    skip = 17) |>
+    dplyr::filter(feature == "gene") |>
     dplyr::mutate(
-        gene_id = attribute %>%
-            stringr::str_extract("ID=[^;]+") %>%
+        gene_id = attribute |>
+            stringr::str_extract("ID=[^;]+") |>
             stringr::str_replace("ID=", ""),
-        description = attribute %>%
-            stringr::str_extract("description=[^;]+") %>%
+        description = attribute |>
+            stringr::str_extract("description=[^;]+") |>
             stringr::str_replace("description=", ""),
-        .before = 1) %>%
+        .before = 1) |>
     dplyr::select(-attribute, -frame)
 
 save(gff_annotations, file = "intermediate_data/gff_annotations.Rdata")
@@ -52,47 +51,49 @@ system(cmd)
 h99_transcripts <- seqinr::read.fasta(
     file = parameters$source_data$genome$transcript_fasta_path,
     seqtype = "AA")
-    
-h99_transcript_annotations <- h99_transcripts %>%
-    purrr::map_chr(~seqinr::getAnnot(.)) %>%
-    data.frame(annotation = .) %>%
+
+h99_transcript_annotations <- data.frame(
+    annotation = h99_transcripts |>
+        purrr::map_chr(~seqinr::getAnnot(.))) |>
     tidyr::separate(
         col = annotation,
-        into = c("cnag_id", "gene", "organism", "gene_product", "transcript_product", "location", "length", "sequence_SO", "SO", "is_pseudo"),
-        sep = " [|] ") %>%
+        into = c(
+            "cnag_id", "gene", "organism", "gene_product", "transcript_product",
+            "location", "length", "sequence_SO", "SO", "is_pseudo"),
+        sep = " [|] ") |>
     dplyr::mutate(
         dplyr::across(
             .cols = everything(),
-            ~stringr::str_replace(., "^[a-zA-Z_]+=", ""))) %>%
+            ~stringr::str_replace(., "^[a-zA-Z_]+=", ""))) |>
     dplyr::mutate(
-        cnag_id = cnag_id %>% stringr::str_replace("^>", ""),
-        variant = cnag_id %>% stringr::str_extract("t[0-9]+_[0-9]+$"),
-        gene_id = cnag_id %>% stringr::str_replace("-t[0-9]+_[0-9]+$", ""),
-        is_pseudo = ifelse(is_pseudo == "true", TRUE, FALSE)) %>%
+        cnag_id = cnag_id |> stringr::str_replace("^>", ""),
+        variant = cnag_id |> stringr::str_extract("t[0-9]+_[0-9]+$"),
+        gene_id = cnag_id |> stringr::str_replace("-t[0-9]+_[0-9]+$", ""),
+        is_pseudo = ifelse(is_pseudo == "true", TRUE, FALSE)) |>
     dplyr::select(-gene)
 
-h99_transcript_annotations <- h99_transcript_annotations %>%
+h99_transcript_annotations <- h99_transcript_annotations |>
     dplyr::left_join(
         gff_annotations,
         by = "gene_id")
 
 
 # get gene-names from fungidb.org
-gene_names <- readr::read_tsv("raw_data/gene_names_20210830.tsv") %>%
+gene_names <- readr::read_tsv("raw_data/gene_names_20210830.tsv") |>
     dplyr::select(
         cnag_id = source_id,
-        gene_symbol = `Gene Name or Symbol`) %>%
+        gene_symbol = `Gene Name or Symbol`) |>
     dplyr::mutate(
         gene_symbol = ifelse(gene_symbol == "N/A", NA, gene_symbol))
 
-h99_transcript_annotations <- h99_transcript_annotations %>%
+h99_transcript_annotations <- h99_transcript_annotations |>
     dplyr::left_join(gene_names, by = "cnag_id")
 
 save(
     h99_transcript_annotations,
     file = "intermediate_data/h99_transcript_annotations.Rdata")
 
-h99_transcript_annotations %>%
+h99_transcript_annotations |>
     readr::write_tsv(file = "product/h99_transcript_annotations_20210724.tsv")
 
 
@@ -139,4 +140,3 @@ go_annotations <- readr::read_tsv(
         "gene_product_form_id"))
 
 save(go_annotations, file = "intermediate_data/go_annotations.Rdata")
-

@@ -1,8 +1,11 @@
 
 
 #' create date code of the form YYYYMMDD
-#' inputs:
-#'    d (optional): date code in the format of Sys.Date() for which to generate the date code, defaulting to 'today'
+#' 
+#' @param d date code in the format of Sys.Date() for which to generate the date
+#'   code, defaulting to 'today'
+#'
+#' 
 #' @export
 date_code <- function(d = NA) {
   # reference http://www.r-cookbook.com/node/17
@@ -12,7 +15,3 @@ date_code <- function(d = NA) {
     sub(pattern, "\\1", d), sub(pattern, "\\2", d), sub(pattern, "\\3", d),
     sep = "")
 }
-
-
-#' @importFrom magrittr %>%
-NULL

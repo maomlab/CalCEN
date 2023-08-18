@@ -3,7 +3,7 @@
 PREFIX=~/opt
 
 install_prerequisites:
-	# sratoolkit
+# sratoolkit
 	git clone git@github.com:ncbi/ngs.git
 	pushd ngs
 	./configure --prefix=${PREFIX}
@@ -31,14 +31,14 @@ install_prerequisites:
 	make install
 	popd
 
-	# bowtie2
+# bowtie2
 	wget https://sourceforge.net/projects/bowtie-bio/files/bowtie2/2.3.4.1/bowtie2-2.3.4.1-linux-x86_64.zip
 	unzip bowtie2-2.3.4.1-linux-x86_64.zip
 	pushd bin
 	ln -s ../bowtie2-2.3.4.1-linux-x86_64/bowtie2* .
 	popd
 
-	# RSEM
+# RSEM
 	git clone git@github.com:deweylab/RSEM.git
 	pushd RSEM
 	make
@@ -58,13 +58,13 @@ test:
 	Rscript -e "spelling::spell_check_package()"
 
 test_alt_builds:
-	# this will email the package developer
+# this will email the package developer
 	Rscript -e "devtools::check_win_devel(quiet = TRUE)"
 	Rscript -e "devtools::check_win_release(quiet = TRUE)"
 	Rscript -e "devtools::check_win_release(quiet = TRUE)"
 	Rscript -e "devtools::check_mac_release(quiet = TRUE)"
 
-	# call rhub::validate_email_first(email = <email>) first
+# call rhub::validate_email_first(email = <email>) first
 	Rscript -e "devtools::check_rhub()"
 	Rscript -e "revdepcheck::revdep_check(num_workers = 4)"
 

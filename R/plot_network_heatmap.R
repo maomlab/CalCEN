@@ -4,12 +4,13 @@
 #' Plot network heatmap
 #'
 #' Create a grayscale heatmap for large matrix
-#' 
+#'
 #' @param network matrix
 #' @param output_fname (should be .png)
-#' @param gene_order sort the genes using the traveling salesman path using the seriation package
+#' @param gene_order sort the genes using the traveling salesman path using
+#'   the seriation package
 #' @param verbose (Default: FALSE)
-#' 
+#'
 #' @export
 plot_network_heatmap <- function(
     network,
@@ -25,7 +26,9 @@ plot_network_heatmap <- function(
     }
     
     if (!dir.exists(dirname(output_fname))) {
-        cat("Output path '", dirname(output_fname), "' does not exist, creating ...\n", sep = "")
+        cat(
+            "Output path '", dirname(output_fname), "' does not exist, ",
+            "creating ...\n", sep = "")
         dir.create(dirname(output_fname))
     }
 
@@ -34,7 +37,7 @@ plot_network_heatmap <- function(
     }
     gene_order <- seriation::seriate(
         x = dist(1 - network),
-        method = gene_order) %>%
+        method = gene_order) |>
         seriation::get_order()
 
     if (verbose) {

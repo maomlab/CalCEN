@@ -88,28 +88,28 @@ n_reads_aligned <- ca_runs %>%
 				frac_exact_align)
 
 p <- ggplot2::ggplot() +
-	ggplot2::theme_bw() +
-  ggplot2::theme(axis.text.x=element_text(angle = 90, hjust = 180)) +
-	ggplot2::geom_dotplot(
-		data = n_reads_aligned,
-		mapping = ggplot2::aes(x=study_accession, y=frac_exact_align),
-		binaxis = 'y', stackdir = 'center',
-		stackratio = .4,
-		dotsize = .3) +
-	ggplot2::facet_wrap(~layout, nrow=2, scales="free_x") +
-	ggplot2::scale_x_discrete(name="SRA Study Accession") +
-	ggplot2::scale_y_continuous(
-		name="Percent reads mapped eactly once to SC5314 Assembly 22",
-		label=scales::percent)
+		ggplot2::theme_bw() +
+		ggplot2::theme(axis.text.x=element_text(angle = 90, hjust = 180)) +
+		ggplot2::geom_dotplot(
+				data = n_reads_aligned,
+				mapping = ggplot2::aes(x=study_accession, y=frac_exact_align),
+				binaxis = 'y', stackdir = 'center',
+				stackratio = .4,
+				dotsize = .3) +
+		ggplot2::facet_wrap(~layout, nrow=2, scales="free_x") +
+		ggplot2::scale_x_discrete(name="SRA Study Accession") +
+		ggplot2::scale_y_continuous(
+				name="Percent reads mapped eactly once to SC5314 Assembly 22",
+				label=scales::percent)
 
 ggplot2::ggsave(
-	filename="product/figures/percent_mapped_once_by_study_20201024.pdf",
-	height=5, width=10,
-	useDingbats=FALSE)
+		filename="product/figures/percent_mapped_once_by_study_20201024.pdf",
+		height=5, width=10,
+		useDingbats=FALSE)
 
 ggplot2::ggsave(
-	filename="product/figures/percent_mapped_once_by_study_20201024.png",
-	height=5, width=10)
+		filename="product/figures/percent_mapped_once_by_study_20201024.png",
+		height=5, width=10)
 
 n_reads_aligned %>%
 		readr::write_tsv("product/figures/percent_mapped_once_by_study_source_data_20201024.tsv")

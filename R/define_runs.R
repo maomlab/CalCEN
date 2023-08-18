@@ -20,9 +20,12 @@ get_sra_connection <- function(parameters, verbose = TRUE) {
         if (verbose) {
             cat("SRA database does not exist, downloading...\n")
         }
-        if (!dir.exists(paste0(parameters$data_paths$scratch_dir, "/sra_meta"))) {
+        if (!dir.exists(
+            paste0(parameters$data_paths$scratch_dir, "/sra_meta"))) {
             if (verbose) {
-                cat("Creating directory ", parameters$data_paths$scratch_dir, "/sra_meta ...\n", sep = "")
+                cat(
+                    "Creating directory ",
+                    parameters$data_paths$scratch_dir, "/sra_meta ...\n", sep = "")
             }
             dir.create(paste0(parameters$data_paths$scratch_dir, "/sra_meta"))
         }

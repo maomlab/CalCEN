@@ -1,6 +1,3 @@
-# -*- tab-width:2;indent-tabs-mode:t;show-trailing-whitespace:t;rm-trailing-spaces:t -*-
-# vi: set ts=2 noet:
-
 library(plyr)
 library(tidyverse)
 
@@ -34,13 +31,13 @@ ggplot2::ggplot() +
         "Pearson correlation Coefficient")
 
 ggplot2::ggsave(
-		filename="product/figures/pearson_vs_spearman_20201024.pdf",
-		height=8, width=8,
-		useDingbats=FALSE)
+    filename="product/figures/pearson_vs_spearman_20201024.pdf",
+    height=8, width=8,
+    useDingbats=FALSE)
 
 ggplot2::ggsave(
-		filename="product/figures/pearson_vs_spearman_20201024.png",
-		height=8, width=8)
+    filename="product/figures/pearson_vs_spearman_20201024.png",
+    height=8, width=8)
 
 
 ################################
@@ -51,17 +48,17 @@ load("intermediate_data/CalCEN_full_direct.Rdata")
 
 # following broom:::tidy.dgTMatrix which is depricated, but I'm not sure why
 # assume rownames and column names are defined
-tidy_sparse_matrix <- function(matrix){
-		s <- Matrix::summary(matrix)
-		tibble::tibble(
-				row = rownames(matrix)[s$i],
-				column = colnames(matrix)[s$j],
-				value = s$x)
+tidy_sparse_matrix <- function(matrix) {
+    s <- Matrix::summary(matrix)
+    tibble::tibble(
+        row = rownames(matrix)[s$i],
+        column = colnames(matrix)[s$j],
+        value = s$x)
 }
 
 for (i in 1:30){
-		z <- CalCEN_full_direct$beta[[i]] %>% tidy_sparse_matrix()
-		cat("for path value '", i, "', n edges: ", nrow(z), "\n", sep = "")
+    z <- CalCEN_full_direct$beta[[i]] %>% tidy_sparse_matrix()
+    cat("for path value '", i, "', n edges: ", nrow(z), "\n", sep = "")
 }
 
 load("intermediate_data/CalCEN_full_direct_bootstrap.Rdata")

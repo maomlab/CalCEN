@@ -1,3 +1,101 @@
+
+#' Submit query to DeepFRI server
+#'
+#' @param pdb_fname proteins structure .pdb file
+#' @param tag used to tracking the prediction on the DeepFRI webserver and for
+#'    the output path if not using use the basename without .pdb extension.
+#'    (default: NULL)
+#' @param verbose use verbose output (default: FALSE)
+#'
+#' @return prediction string which can be used to retrieve the results from
+#'     the server
+#'
+deepfri_submit <- function(
+   pdb_fname,
+   tag = NULL,
+   verbose = FALSE) {
+
+  if (verbose) {
+    cat("  Submitting prediction for ", tag, " ...\n", sep = "")
+  }
+  submit_result <- httr::POST(
+    url = paste0(
+      "https://beta.api.deepfri.flatironinstitute.org/workspace/",
+      "6PXMJP/predictions"),
+    httr::add_headers(
+      content_type = "multipart/form-data"),
+    body = list(
+      file = httr::upload_file(
+        path = pdb_fname,
+        type = "application/octet-stream"),
+      inputType = "structureFile",
+      tags = c("tag")))
+  if (submit_result$status_code != 200) {
+    cat(
+      "WARNING status of submit request is '",
+      submit_result$status_code, "' is not 200\n", sep = "")
+  }
+  prediction_name <- httr::content(submit_result)$predictions[[1]]$name
+  if (verbose) {
+    cat(
+      "  Prediction name for tag '", tag, "': ",
+      prediction_name, "\n", sep = "")
+  }
+  prediction_name
+}
+
+#' Retrieve results from DeepFRI server
+#'
+#' @param prediction_name name for the prediction that is generated
+#'   when it is submitted
+#' @param max_retries (default: 120)
+#' @param verbose use verbose output (default: FALSE)
+#'
+#' @return prediction parsed JSON of results
+deepfri_retrieve_results <- function(
+  prediction_name,
+  max_retries = 120,
+  verbose = FALSE) {
+
+  # wait till the results are ready
+  retrieve_state <- "submitted"
+  n_retries <- 0
+  while (retrieve_state %in% c("submitted", "enqueued")) {
+    retrieve_result <- httr::GET(
+      url = paste0(
+        "https://beta.api.deepfri.flatironinstitute.org/workspace/",
+        "6PXMJP/predictions/", prediction_name))
+
+    if (retrieve_result$status_code != 200) {
+      cat(
+        "WARNING status of retrieve request is '",
+        retrieve_result$status_code, "' is not 200\n", sep = "")
+    }
+    prediction <- httr::content(retrieve_result)$prediction
+
+    retrieve_state <- ifelse(
+      is.null(prediction$state),
+      "failed",
+      prediction$state)
+
+    n_retries <- n_retries + 1
+    if (retrieve_state == "enqueued") {
+      if (n_retries < max_retries) {
+        if (verbose) {
+          cat("  Retrieve retry #", n_retries, "\n", sep = "")
+        }
+        Sys.sleep(5)
+      } else {
+        cat("Retried for > 10 minutes, failing\n")
+        retrieve_state <<- "failed"
+        stop("Failed")
+      }
+    } else {
+      cat("  Retrieve state: ", retrieve_state, "\n", sep = "")
+    }
+  }
+}
+
 #' Use the DeepFRI webserver for gene function prediction
 #'
 #'  @description Using the https://beta.deepfri.flatironinstitute.org/
@@ -14,7 +112,7 @@
 #' @param output_path folder where the output predictions should be written
 #'    if null, then don't save output to file. (default: NULL)
 #' @param max_retries (default: 120)
-#' @param verbose use verbose output (default: TRUE)
+#' @param verbose use verbose output (default: FALSE)
 #' @return data.frame with columns
 #'     structure_tag: <tag>
 #'     prediction_type: [cnn, gcn] for sequence and structure based predictions
@@ -46,7 +144,7 @@ get_deepfri_predictions <- function(
   tag = NULL,
   output_path = NULL,
   max_retries = 120,
-  verbose = TRUE) {
+  verbose = FALSE) {
 
   if (is.null(tag)) {
     tag <- pdb_fname |> basename() |> stringr::str_replace("[.]pdb$", "")
@@ -64,63 +162,19 @@ get_deepfri_predictions <- function(
   }
 
   if (!dir.exists(output_path)) {
-      cat("  creating output path '", output_path, "'\n", sep = "")
-      dir.create(output_path)
+    cat("  creating output path '", output_path, "'\n", sep = "")
+    dir.create(output_path)
   }
 
-  if (verbose) {
-    cat("  Submitting prediction for ", tag, " ...\n", sep = "")
-  }
-  submit_result <- httr::POST(
-    url = "https://beta.api.deepfri.flatironinstitute.org/workspace/6PXMJP/predictions",
-    httr::add_headers(
-      content_type = "multipart/form-data"),
-    body = list(
-      file = httr::upload_file(
-        path = pdb_fname,
-        type = "application/octet-stream"),
-      inputType = "structureFile",
-      tags = c("tag")))
-  if (submit_result$status_code != 200) {
-    cat("WARNING status of submit request is '", submit_request$status_code, "' is not 200\n", sep = "")
-  }
-  prediction_name <- httr::content(submit_result)$predictions[[1]]$name
-  if (verbose) {
-    cat("  Prediction name for tag '", tag, "': ", prediction_name, "\n", sep = "")
-  }
+  prediction_name <- deepfri_submit(
+    tag = tag,
+    pdb_fname = pdb_fname,
+    verbose = verbose)
 
-  # wait till the results are ready
-  retrieve_state <- "submitted"
-  n_retries <- 0
-  while(retrieve_state %in% c("submitted", "enqueued")) {
-    retrieve_result <- httr::GET(
-      url = paste0(
-        "https://beta.api.deepfri.flatironinstitute.org/workspace/6PXMJP/predictions/",
-        prediction_name))
-
-    if (retrieve_result$status_code != 200) {
-      cat("WARNING status of retrieve request is '", retrieve_result$status_code, "' is not 200\n", sep = "")
-    }
-    prediction <- httr::content(retrieve_result)$prediction
-
-    retrieve_state <- ifelse(is.null(prediction$state), "failed", prediction$state)
-
-    n_retries <- n_retries + 1
-    if (retrieve_state == "enqueued") {
-      if (n_retries < max_retries) {
-        if (verbose) {
-          cat("  Retrieve retry #", n_retries, "\n", sep = "")
-        }
-        Sys.sleep(5)
-      } else {
-        cat("Retried for > 10 minutes, failing\n")
-        retrieve_state <<- "failed"
-        stop("Failed")
-      }
-    } else {
-      cat("  Retrieve state: ", retrieve_state, "\n", sep = "")
-    }
-  }
+  prediction <- deepfri_retrieve_results(
+    prediction_name,
+    max_retries,
+    verbose)
 
   if (verbose) {
     cat("  Gathering predictions for tag ", tag, "\n", sep = "")

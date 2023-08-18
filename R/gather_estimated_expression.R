@@ -7,7 +7,7 @@
 #' gather_estimated_expression parses files of the form
 #'
 #'      <results_dir>/<run_accession>.genes.results
-#' 
+#'
 #' @param results_dir path used in e.g. estimate_expression(...)
 #' @param verbose (default: true)
 #' @return a data.frame with columns (see RSEM for interpretation)
@@ -37,10 +37,10 @@ gather_estimated_expression <- function(
             "Gathering estimated expression for ", length(results_files), " runs in ",
             " '", results_dir, "' ...\n", sep = "")
     }
-    
-    estimated_expression <- results_files %>%
+   
+    results_files |>
         plyr::ldply(function(results_fname) {
-            results <- readr::read_tsv(
+            readr::read_tsv(
                 file = paste0(results_dir, "/", results_fname),
                 col_types = readr::cols(
                     gene_id = readr::col_character(),
@@ -49,10 +49,10 @@ gather_estimated_expression <- function(
                     effective_length = readr::col_double(),
                     expected_count = readr::col_double(),
                     TPM = readr::col_double(),
-                    FPKM = readr::col_double())) %>%
-                dplyr::rename(transcript_ids = `transcript_id(s)`) %>%
+                    FPKM = readr::col_double())) |>
+                dplyr::rename(transcript_ids = `transcript_id(s)`) |>
                 dplyr::mutate(
-                    run_accession = results_fname %>% stringr::str_extract("^[^.]+"),
+                    run_accession = results_fname |> stringr::str_extract("^[^.]+"),
                     .before = 1)
         })
 }
@@ -81,7 +81,7 @@ gather_estimated_expression_meta <- function(
     log_files <- list.files(
         path = paste0(results_dir, "/logs"),
         pattern = "*log")
-    
+   
     if (verbose) {
         cat(
             "Gathering estimated expression for ", length(log_files), " runs in ",
@@ -89,7 +89,7 @@ gather_estimated_expression_meta <- function(
     }
 
 
-    estimated_expression_meta <- log_files  %>%
+    estimated_expression_meta <- log_files  |>
 	plyr::ldply(function(log_fname) {
             cat("processing log file: ", log_fname, " ...\n", sep = "")
             tryCatch({
@@ -135,11 +135,13 @@ gather_estimated_expression_meta <- function(
                     as.numeric()
                 run_time <- ifelse(length(run_time) == 0, NA, run_time)
                 tibble::tibble(
-                    run_accession = log_fname %>% stringr::str_replace(".log", ""),
+                    run_accession = log_fname |>
+                        stringr::str_replace(".log", ""),
                     n_reads = n_reads,
                     n_reads_aligned_0_times = n_reads_aligned_0_times,
                     n_reads_aligned_1_time = n_reads_aligned_1_time,
-                    n_reads_aligned_mutiple_times = n_reads_aligned_mutiple_times,
+                    n_reads_aligned_mutiple_times =
+                        n_reads_aligned_mutiple_times,
                     overall_alignment_percent = overall_alingment_percent,
                     run_time = run_time)
             }, error = function(e) {

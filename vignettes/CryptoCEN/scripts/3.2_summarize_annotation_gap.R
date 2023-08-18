@@ -1,9 +1,8 @@
-
-
-
 library(tidyverse)
 library(ggplot2)
 library(CalCEN)
+library(UpSetR)
+
 
 parameters <- CalCEN::load_parameters()
 
@@ -19,7 +18,7 @@ parameters <- CalCEN::load_parameters()
 #   propagate
 #   filter out "NOT" qualified annotations
 #   filter for terms with < 1000 annotations
-#   
+#
 # CryptoNet Edge
 # Co-expression cluster
 # BioGRID PPI
@@ -34,95 +33,97 @@ load("intermediate_data/H99_to_sac_orthoMCL.Rdata")
 load("intermediate_data/CryptoNetV1.Rdata")
 
 UMAP_genes_cluster_labels <- readr::read_tsv(
-    "product/figures/coexp_embedding/UMAP_genes_cluster_labels_20210815.tsv")
+    "product/figures/coexp_embedding/UMAP_genes_cluster_labels_20210815.tsv",
+    show_col_types = FALSE)
 
 
 
-data <- h99_transcript_annotations %>%
-    dplyr::filter(!is_pseudo) %>%
+data <- h99_transcript_annotations |>
+    dplyr::filter(!is_pseudo) |>
     # is orphan
     dplyr::transmute(
         cnag_id,
         gene_id,
         is_orphan =
-            (description %>% stringr::str_detect("hypothetical protein")) |
-            (description %>% stringr::str_detect("unspecified product"))) %>%
+            (description |> stringr::str_detect("hypothetical protein")) |
+            (description |> stringr::str_detect("unspecified product"))) |>
     # un annotated
     dplyr::left_join(
-        go_annotations_propagated %>%
-            dplyr::rename(gene_id = db_object_id) %>%
-            dplyr::count(gene_id, ontology) %>%
+        go_annotations_propagated |>
+            dplyr::rename(gene_id = db_object_id) |>
+            dplyr::count(gene_id, ontology) |>
             tidyr::pivot_wider(
                 id_cols = "gene_id",
                 names_prefix = "count_",
                 names_from = "ontology",
                 values_from = "n",
                 values_fill = 0),
-        by = "gene_id") %>%
+        by = "gene_id") |>
     dplyr::mutate(across(
         .cols = tidyselect::starts_with("count_"),
-        ~ifelse(is.na(.), 0, .))) %>%
+        ~ifelse(is.na(.), 0, .))) |>
     # no sac ortholog blast
     dplyr::left_join(
-        H99_to_sac_best_hits %>%
+        H99_to_sac_best_hits |>
             dplyr::transmute(
                 gene_id,
                 has_sac_ortholog_blast = !is.na(sac_standard_name)),
-        by = "gene_id") %>%
-    dplyr::mutate(has_sac_ortholog_blast = !is.na(has_sac_ortholog_blast)) %>%
+        by = "gene_id") |>
+    dplyr::mutate(has_sac_ortholog_blast = !is.na(has_sac_ortholog_blast)) |>
     # no sac ortholog orthoMCL
     dplyr::left_join(
-        H99_to_sac_orthoMCL %>%
+        H99_to_sac_orthoMCL |>
         dplyr::transmute(
-            gene_id = cneq %>% unlist(),
+            gene_id = cneq |> unlist(),
             has_sac_ortholog_orthoMCL = TRUE),
-        by = "gene_id") %>%
-    dplyr::mutate(has_sac_ortholog_orthoMCL = !is.na(has_sac_ortholog_orthoMCL)) %>%
+        by = "gene_id") |>
+    dplyr::mutate(
+        has_sac_ortholog_orthoMCL = !is.na(has_sac_ortholog_orthoMCL)) |>
     #in CryptoNet
     dplyr::left_join(
-        CryptoNetV1 %>%
-        dplyr::distinct(target1) %>%
+        CryptoNetV1 |>
+        dplyr::distinct(target1) |>
         dplyr::transmute(
             gene_id = target1,
             in_CryptoNetV1 = TRUE),
-        by = "gene_id") %>%
-    dplyr::mutate(in_CryptoNetV1 = !is.na(in_CryptoNetV1)) %>%
+        by = "gene_id") |>
+    dplyr::mutate(in_CryptoNetV1 = !is.na(in_CryptoNetV1)) |>
     # expression cluster label
     dplyr::left_join(
-        UMAP_genes_cluster_labels %>%
+        UMAP_genes_cluster_labels |>
         dplyr::transmute(
             cnag_id,
             cluster_label),
         by = "cnag_id")
 
 # how many gene products
-data %>% nrow()
+data |> nrow()
 # 9185
 
 # how many genes
-data %>% dplyr::distinct(gene_id) %>% nrow
+data |> dplyr::distinct(gene_id) |> nrow()
 # 8334
 
 # totally un-annotated
-data %>%
+data |>
     dplyr::distinct(
         gene_id,
-        .keep_all = TRUE) %>%
+        .keep_all = TRUE) |>
     dplyr::filter(
         is_orphan,
         count_BP == 0,
         !has_sac_ortholog_blast,
         !has_sac_ortholog_orthoMCL,
-        !in_CryptoNetV1) %>%
+        !in_CryptoNetV1) |>
     nrow()
 # 1359
 
-data %>%
+data |>
     dplyr::distinct(
         gene_id,
-        .keep_all = TRUE) %>%
+        .keep_all = TRUE) |>
     dplyr::filter(
-        !is_orphan) %>%
+        !is_orphan) |>
     dplyr::count(
         count_BP == 0,
         !has_sac_ortholog_blast,
@@ -142,3 +143,47 @@ data %>%
 #  N  N   Y
 #  N  N   N         Y
 #  N  N   N         N
+
+######
+
+
+plot_data <- list(
+    Genes = data |>
+        purrr::pluck("cnag_id"),
+    `Has BP` = data |>
+        dplyr::filter(count_BP > 0) |>
+        purrr::pluck("cnag_id"),
+    `Sac Ortholog` = data |>
+        dplyr::filter(
+            has_sac_ortholog_blast | has_sac_ortholog_orthoMCL) |>
+        purrr::pluck("cnag_id"),
+    `Real Gene Product` = data |>
+        dplyr::filter(!is_orphan) |>
+        purrr::pluck("cnag_id"),
+    `In CryptoNetV1` = data |>
+        dplyr::filter(in_CryptoNetV1) |>
+        purrr::pluck("cnag_id"))
+
+
+pdf(
+    file = paste0(
+        "product/figures/summarize_annotation_gap/",
+        "summarize_annotation_gap_20221219.pdf"),
+    width = 5,
+    height = 4)
+    
+UpSetR::upset(
+   data = plot_data |> UpSetR::fromList(),
+   sets = c(
+       "Has BP",
+       "Sac Ortholog",
+       "Real Gene Product",
+       "In CryptoNetV1",
+       "Genes"),
+   keep.order = TRUE)
+dev.off()
+
+data |> readr::write_tsv(
+    paste0(
+        "product/figures/summarize_annotation_gap/",
+        "summarize_annotation_gap_data-20221219.tsv"))

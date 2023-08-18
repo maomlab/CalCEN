@@ -18,7 +18,9 @@ download_expression_data <- function(
     ) {
 
     if (verbose) {
-        cat("Checking if output director '", sra_dir, "' exists ...\n", sep = "")
+        cat(
+            "Checking if output director '", sra_dir, "' exists ...\n",
+            sep = "")
     }
     if (!dir.exists(paths = sra_dir)) {
         cat("Creating ", sra_dir, " ...\n", sep = "")
@@ -26,21 +28,23 @@ download_expression_data <- function(
     }
 
     get_runs_remaining <- function(runs, sra_dir) {
-        retrieved_runs <- list.files(
-            path = sra_dir,
-            pattern = "*.sra") %>%
-            stringr::str_extract("^[^.]+") %>%
-            tibble::tibble(run_accession = .)
+        retrieved_runs <- tibble::tibble(
+            run_accession = list.files(
+                path = sra_dir,
+                pattern = "*.sra") |>
+                stringr::str_extract("^[^.]+")
 
-        runs_remaining <- runs %>%
+        runs_remaining <- runs |>
             dplyr::anti_join(
                 retrieved_runs, by = "run_accession")
-        cat("Downloading {nrow(runs_remaining)} more runs ...\n\n" %>% glue::glue())
+        cat("Downloading {nrow(runs_remaining)} more runs ...\n\n" |> glue::glue())
         runs_remaining
     }
 
     download_run <- function(run, sra_dir) {
-        cat("Download SRA run '", run$run_accession[1], "' for study '", run$study_accession[1], "'\n", sep = "")
+        cat(
+            "Download SRA run '", run$run_accession[1], "' for study ",
+            "'", run$study_accession[1], "'\n", sep = "")
 
         tryCatch({
             command <- paste0("cd ", sra_dir, " && ",
@@ -63,14 +67,14 @@ download_expression_data <- function(
     done <- FALSE
     while (!done) {
         runs_remaining <- get_runs_remaining(runs, sra_dir)
-        n_runs <- runs_remaining %>% nrow
-        if (runs_remaining %>% nrow == 0) {
+        n_runs <- runs_remaining |> nrow()
+        if (runs_remaining |> nrow() == 0) {
             cat("Done!\n")
             done <<- TRUE
         }
 
         # this can take ~ 2 days on a university network
-        runs_remaining %>%
+        runs_remaining |>
             plyr::a_ply(1, function(run) {
                 status <- download_run(run, sra_dir)
                 if (status == "success") {
@@ -93,23 +97,22 @@ download_expression_data <- function(
 #' @export
 validate_downloaded_runs <- function(sra_dir) {
     # check retrieved runs for download integrety
-    retrieved_runs <- list.files(
-        path = sra_dir,
-        pattern = "*.sra$",
-        recursive = TRUE) %>%
-
-    retrieved_runs <- tibble::tibble(run_fname = .) %>%
+    retrieved_runs <- tibble::tibble(
+        run_fname = list.files(
+            path = sra_dir,
+            pattern = "*.sra$",
+            recursive = TRUE) |>
         dplyr::mutate(
-            run_accession = run_fname %>% stringr::str_extract("^[^/.]+"))
+            run_accession = run_fname |> stringr::str_extract("^[^/.]+"))
 
     cat("Found ", nrow(retrieved_runs), " runs to validate ...\n", sep = "")
 
-    validated_runs <- retrieved_runs %>%
+    validated_runs <- retrieved_runs |>
         plyr::adply(1, function(run) {
             sra_fname <- paste0(sra_dir, "/", run$run_fname[1])
             cat("checking SRA run '", run$run_accession[1], "': ", sra_fname, "\n", sep="")
-            is_consistent <- system2("vdb-validate", sra_fname, stdout = TRUE, stderr = TRUE) %>%
-                stringr::str_detect("is consistent") %>%
+            is_consistent <- system2("vdb-validate", sra_fname, stdout = TRUE, stderr = TRUE) |>
+                stringr::str_detect("is consistent") |>
                 any()
             tibble::tibble(
                 sra_fname = sra_fname,
@@ -117,11 +120,11 @@ validate_downloaded_runs <- function(sra_dir) {
         })
 
     # remove broken runs
-    "Found {n_good} good and {n_bad} bad runs...\n\n" %>%
+    cat(
+        "Found {n_good} good and {n_bad} bad runs...\n\n" |>
         glue::glue(
-            n_good = validated_runs %>% dplyr::filter(is_consistent) %>% nrow,
-            n_bad = validated_runs %>% dplyr::filter(!is_consistent) %>% nrow) %>%
-        cat()
+            n_good = validated_runs |> dplyr::filter(is_consistent) |> nrow(),
+            n_bad = validated_runs |> dplyr::filter(!is_consistent) |> nrow()))
 
     validated_runs
 }

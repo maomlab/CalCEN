@@ -1,5 +1,3 @@
-
-
 library(plyr)
 library(dplyr)
 library(hdf5r)
@@ -36,7 +34,9 @@ candida_prio_agg_net <- dataset[["agg"]][, ]
 
 colnames(candida_prio_agg_net) <- candida_prio_agg_genes$feature_name
 rownames(candida_prio_agg_net) <- candida_prio_agg_genes$feature_name
-save(candida_prio_agg_net, file = "intermediate_data/CoCoCoNet_candida_prio_agg_net_20210104.Rdata")
+save(
+    candida_prio_agg_net,
+    file = "intermediate_data/CoCoCoNet_candida_prio_agg_net_20210104.Rdata")
 
 
 system(
@@ -62,5 +62,6 @@ candida_meta_agg_genes <- meta[["row"]][] %>%
 candida_meta_agg_net <- meta[["agg"]][, ]
 colnames(candida_meta_agg_net) <- candida_meta_agg_genes$feature_name
 rownames(candida_meta_agg_net) <- candida_meta_agg_genes$feature_name
-save(candida_meta_agg_net, file = "intermediate_data/CoCoCoNet_candida_meta_agg_net_20210104.Rdata")
-
+save(
+    candida_meta_agg_net,
+    file = "intermediate_data/CoCoCoNet_candida_meta_agg_net_20210104.Rdata")

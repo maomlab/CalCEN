@@ -1,6 +1,3 @@
-# -*- tab-width:2;indent-tabs-mode:t;show-trailing-whitespace:t;rm-trailing-spaces:t -*-
-# vi: set ts=2 noet:
-
 library(plyr)
 library(dplyr)
 library(stringr)
@@ -25,46 +22,46 @@ load("intermediate_data/yeast_net_TS.Rdata")
 
 
 ca_to_sac <- chromosome_features %>%
-	dplyr::filter(
-		feature_name %in% ca_genes,
-		!is.na(sac_ortholog)) %>%
-	dplyr::select(
-		ca_feature_name=feature_name,
-		sac_ortholog) %>%
-	dplyr::inner_join(
-		sac_chromosome_features %>%
-			dplyr::transmute(
-				sac_ortholog = ifelse(is.na(standard_gene_name), feature_name, standard_gene_name),
-				sac_feature_name = feature_name),
-		by="sac_ortholog") %>%
-	dplyr::select(
-		ca_feature_name,
-		sac_feature_name)
+    dplyr::filter(
+        feature_name %in% ca_genes,
+        !is.na(sac_ortholog)) %>%
+    dplyr::select(
+        ca_feature_name=feature_name,
+        sac_ortholog) %>%
+    dplyr::inner_join(
+        sac_chromosome_features %>%
+        dplyr::transmute(
+            sac_ortholog = ifelse(is.na(standard_gene_name), feature_name, standard_gene_name),
+            sac_feature_name = feature_name),
+        by="sac_ortholog") %>%
+    dplyr::select(
+        ca_feature_name,
+        sac_feature_name)
 
-build_yeast_net_network <- function(tag, data){
+build_yeast_net_network <- function(tag, data) {
 
-	cat("Building network for '", tag, "' network\n", sep="")
- 	ca_data <- data %>%
-		dplyr::inner_join(
-			ca_to_sac %>% dplyr::rename(gene1=sac_feature_name, feature_name_1=ca_feature_name),
-			by="gene1") %>%
-		dplyr::inner_join(
-			ca_to_sac %>% dplyr::rename(gene2=sac_feature_name, feature_name_2=ca_feature_name),
-			by="gene2") %>%
-		dplyr::select(feature_name_1, feature_name_2, score) %>%
-		dplyr::distinct(feature_name_1, feature_name_2, .keep_all=TRUE)
+    cat("Building network for '", tag, "' network\n", sep="")
+    ca_data <- data %>%
+        dplyr::inner_join(
+            ca_to_sac %>% dplyr::rename(gene1=sac_feature_name, feature_name_1=ca_feature_name),
+            by="gene1") %>%
+        dplyr::inner_join(
+            ca_to_sac %>% dplyr::rename(gene2=sac_feature_name, feature_name_2=ca_feature_name),
+            by="gene2") %>%
+        dplyr::select(feature_name_1, feature_name_2, score) %>%
+        dplyr::distinct(feature_name_1, feature_name_2, .keep_all=TRUE)
 
-	n_nodes <- c(
-		ca_data %>% magrittr::extract2("feature_name_1"),
-		ca_data %>% magrittr::extract2("feature_name_2")) %>%
-		unique %>%
-		length
-	cat("\tn nodes: ", n_nodes , "\n", sep="")
-	cat("\tn edges: ", ca_data %>% nrow, "\n", sep="")
+    n_nodes <- c(
+        ca_data %>% magrittr::extract2("feature_name_1"),
+        ca_data %>% magrittr::extract2("feature_name_2")) %>%
+        unique %>%
+        length
+    cat("\tn nodes: ", n_nodes , "\n", sep="")
+    cat("\tn edges: ", ca_data %>% nrow, "\n", sep="")
 
-	network <- ca_data %>%
-		as.data.frame() %>%
-		EGAD::build_weighted_network(ca_genes)
+    network <- ca_data %>%
+        as.data.frame() %>%
+        EGAD::build_weighted_network(ca_genes)
 }
 
 
@@ -89,5 +86,3 @@ save(yeast_net_HT_network, file="intermediate_data/yeast_net_HT_network.Rdata")
 save(yeast_net_LC_network, file="intermediate_data/yeast_net_LC_network.Rdata")
 save(yeast_net_PG_network, file="intermediate_data/yeast_net_PG_network.Rdata")
 save(yeast_net_TS_network, file="intermediate_data/yeast_net_TS_network.Rdata")
-
-
